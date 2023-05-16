@@ -5,9 +5,10 @@ const { getUser, getUsers, updateUser } = require('../controllers/user.controlle
 // Middlewares
 const { validate } = require('../middleware/validate.middleware')
 // DTOs
-const { getUsersDTO, updateUserDTO } = require('../dto/user.dto')
+const { updateUserDTO } = require('../dto/user.dto')
+const { paginationDTO } = require('../dto/common.dto')
 // Routes
-router.get('/all', validate(getUsersDTO), getUsers)
+router.get('/all', validate(paginationDTO), getUsers)
 router.get('/', getUser)
 router.put('/', validate(updateUserDTO), updateUser)
 

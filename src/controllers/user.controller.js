@@ -1,13 +1,15 @@
 const User = require('../models/user.model')
 
-const DEFAULT_LIMIT = 2
+const DEFAULT_LIMIT = 1
+const DEFAULT_SORT = -1
+const DEFAULT_PAGE = 1
 
 async function getUsers(req, res, next) {
-  const isAll = Boolean(req.query.all)
-  const sort = req.query.sort ? (req.query.sort === 'asc' ? 1 : -1) : -1
+  const isAll = req.query?.all ? req.query.all === 'true' : false
+  const sort = req.query?.sort ? (req.query.sort === 'asc' ? 1 : -1) : DEFAULT_SORT
 
   let limit = parseInt(req.query.limit) || DEFAULT_LIMIT
-  let page = parseInt(req.query.page) || 1
+  let page = parseInt(req.query.page) || DEFAULT_PAGE
 
   let skip = (page - 1) * limit
 

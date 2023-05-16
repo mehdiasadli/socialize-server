@@ -1,20 +1,5 @@
 const { z } = require('zod')
 
-const getUsersDTO = z.object({
-  query: z.object({
-    page: z.optional(
-      z.preprocess((value) => parseInt(z.string().parse(value), 10), z.number().positive())
-    ),
-    limit: z.optional(
-      z.preprocess((value) => parseInt(z.string().parse(value), 10), z.number().positive())
-    ),
-    all: z.optional(z.string()),
-    sort: z.optional(z.enum(['asc', 'desc'], {
-        invalid_type_error: 'Sort must be either "asc" or "desc"'
-    }))
-  })
-})
-
 const updateUserDTO = z.object({
   body: z.object({
     firstName: z.optional(
@@ -40,4 +25,4 @@ const updateUserDTO = z.object({
   })
 })
 
-module.exports = { getUsersDTO, updateUserDTO }
+module.exports = { updateUserDTO }
