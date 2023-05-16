@@ -1,5 +1,43 @@
 const User = require('../models/user.model')
 
+const DEFAULT_LIMIT = 2
+
+async function getUsers(req, res, next) {
+  const isAll = Boolean(req.query.all)
+  const sort = req.query.sort ? (req.query.sort === 'asc' ? 1 : -1) : -1
+
+  let limit = parseInt(req.query.limit) || DEFAULT_LIMIT
+  let page = parseInt(req.query.page) || 1
+
+  let skip = (page - 1) * limit
+
+  try {
+    const total = await User.find().countDocuments()
+    if (isAll) {
+      page = 1
+      limit = total
+      skip = 0
+    }
+    const users = await User.find().skip(skip).limit(limit).sort({ createdAt: sort })
+
+    const totalPages = Math.ceil(total / limit)
+
+    return res.status(200).json({
+      success: true,
+      status: 200,
+      message: 'Users fetched successfully',
+      data: users,
+      page,
+      itemsPerPage: limit,
+      total,
+      totalPages,
+      isAll
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 async function getUser(req, res) {
   const data = {
     _id: req.user._id,
@@ -46,4 +84,4 @@ async function updateUser(req, res, next) {
   }
 }
 
-module.exports = { getUser, updateUser }
+module.exports = { getUser, updateUser, getUsers }
