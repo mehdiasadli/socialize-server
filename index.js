@@ -22,13 +22,18 @@ app.use(cookieParser())
 connectToDB()
 
 // Routes
-app.use('/api/user', verifyToken, require('./src/routes/user.route'))
-app.use('/api/auth', require('./src/routes/auth.route'))
-// app.use(paths.user, verifyToken, require('./src/routes/user.route'))
-// app.use(paths.coll, verifyToken, require('./src/routes/collection.route'))
-// app.use(paths.blog, verifyToken, require('./src/routes/blog.route'))
-// app.use(paths.comm, verifyToken, require('./src/routes/comment.route'))
+const routes = require('./src/lib/resources/routes')
 
+const authRoute = require('./src/routes/auth.route')
+const userRoute = require('./src/routes/user.route')
+
+app.use(routes.auth, authRoute)
+app.use(routes.user, verifyToken, userRoute)
+// 404 Route
+app.all('*', (_, res) =>
+  res.status(404).json({ success: false, status: 404, message: 'Page not found' })
+)
+// Error handler Middleware
 app.use(handleError)
 
 // Listen the server
