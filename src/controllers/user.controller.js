@@ -1,8 +1,14 @@
 const User = require('../models/user.model')
+const cloudinary = require('../config/cloudinary.config')
 
 const DEFAULT_LIMIT = 20
 const DEFAULT_SORT = -1
 const DEFAULT_PAGE = 1
+
+const IMAGE_TYPES = {
+  profile: { folder: 'profile_images', field: 'profile_image', name: 'Profile' },
+  cover: { folder: 'cover_images', field: 'cover_image', name: 'Cover' }
+}
 
 async function getUsers(req, res, next) {
   const isAll = req.query?.all ? req.query.all === 'true' : false
@@ -28,7 +34,7 @@ async function getUsers(req, res, next) {
       success: true,
       status: 200,
       message: 'Users fetched successfully',
-      data: users,
+      data: users.map((user) => user.getPublic()),
       page,
       itemsPerPage: limit,
       total,
@@ -41,21 +47,17 @@ async function getUsers(req, res, next) {
 }
 
 async function getUser(req, res) {
-  const data = {
-    _id: req.user._id,
-    firstName: req.user.firstName,
-    lastName: req.user.lastName,
-    username: req.user.username
-  }
-
-  return res
-    .status(200)
-    .json({ success: true, status: 200, message: 'User info sent successfully', data })
+  return res.status(200).json({
+    success: true,
+    status: 200,
+    message: 'User info sent successfully',
+    data: req.user.getPublic()
+  })
 }
 
 async function updateUser(req, res, next) {
   try {
-    const user = await User.findById(req.user._id)
+    const user = await User.findById(req.user._id).select('-password')
 
     if (user) {
       user.firstName = req.body.firstName || user.firstName
@@ -71,12 +73,7 @@ async function updateUser(req, res, next) {
         success: true,
         status: 200,
         message: 'User updated successfully',
-        data: {
-          _id: updated._id,
-          firstName: updated.firstName,
-          lastName: updated.lastName,
-          username: updated.username
-        }
+        data: updated.getPublic()
       })
     } else {
       next({ statusCode: 404, message: 'User not found' })
@@ -86,4 +83,54 @@ async function updateUser(req, res, next) {
   }
 }
 
-module.exports = { getUser, updateUser, getUsers }
+async function uploadImage(req, res, next) {
+  const { image } = req.body
+  const { type } = req.params // profile, cover
+
+  try {
+    const result = await cloudinary.uploader.upload(image, {
+      folder: `socialize/${IMAGE_TYPES[type].folder}`
+    })
+
+    req.user[IMAGE_TYPES[type].field] = {
+      public_id: result.public_id,
+      url: result.secure_url
+    }
+
+    await req.user.save()
+    return res.status(200).json({
+      success: true,
+      status: 200,
+      message: `${IMAGE_TYPES[type].name} image uploaded successfully`,
+      data: req.user.getPublic()
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+async function deleteImage(req, res, next) {
+  const { type } = req.params
+
+  try {
+    req.user[IMAGE_TYPES[type].field] = {}
+    await req.user[IMAGE_TYPES[type].field].save()
+
+    return res.status(200).json({
+      success: true,
+      status: 200,
+      message: `${IMAGE_TYPES[type].name} image deleted successfully`,
+      data: req.user.getPublic()
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = {
+  getUser,
+  updateUser,
+  getUsers,
+  uploadImage,
+  deleteImage
+}

@@ -25,4 +25,28 @@ const updateUserDTO = z.object({
   })
 })
 
-module.exports = { updateUserDTO }
+const uploadImageDTO = z.object({
+  body: z.object({
+    image: z.string({
+      required_error: 'Image is required',
+      invalid_type_error: 'Image must be a string'
+    })
+  }),
+  params: z.object({
+    type: z.enum(['profile', 'cover'], {
+      required_error: 'Image type is required',
+      invalid_type_error: 'Image type can be either "profile" or "cover"'
+    })
+  })
+})
+
+const deleteImageDTO = z.object({
+  params: z.object({
+    type: z.enum(['profile', 'cover'], {
+      required_error: 'Image type is required',
+      invalid_type_error: 'Image type can be either "profile" or "cover"'
+    })
+  })
+})
+
+module.exports = { updateUserDTO, updateProfileImageDTO, uploadImageDTO, deleteImageDTO }

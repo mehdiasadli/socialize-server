@@ -19,12 +19,7 @@ async function signIn(req, res, next) {
         success: true,
         status: 200,
         message: 'User logged in successfully',
-        data: {
-          _id: user._id,
-          username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName
-        }
+        data: user.getPublic()
       })
     } else {
       next({ message: 'Invalid username or password', statusCode: 400 })
@@ -61,12 +56,7 @@ async function signUp(req, res, next) {
         success: true,
         status: 200,
         message: 'User created successfully',
-        data: {
-          _id: user._id,
-          username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName
-        }
+        data: user.getPublic()
       })
     } else {
       next({})
@@ -82,7 +72,7 @@ async function signUp(req, res, next) {
  * @desc   Signs out the user
  * @access Public
  */
-async function signOut(req, res, next) {
+async function signOut(_, res, next) {
   try {
     res.cookie('jwt', '', {
       httpOnly: true,

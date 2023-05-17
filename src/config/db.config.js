@@ -5,4 +5,4 @@ const connectToDB = () => {
   connect(db)
 }
 
-module.exports = { connectToDB }
+module.exports = connectToDB

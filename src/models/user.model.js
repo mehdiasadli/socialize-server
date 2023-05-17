@@ -11,7 +11,15 @@ const userModel = new Schema(
       unique: [true, 'Username already in use'],
       trim: true
     },
-    password: { type: String, required: [true, 'Password is required'], trim: true }
+    password: { type: String, required: [true, 'Password is required'], trim: true },
+    profile_image: {
+      public_id: { type: String, required: true },
+      url: { type: String, required: true }
+    },
+    cover_image: {
+      public_id: { type: String, required: true },
+      url: { type: String, required: true }
+    }
   },
   { timestamps: true }
 )
@@ -35,6 +43,20 @@ userModel.methods.matchPasswords = async function (password, next) {
   } catch (error) {
     next(error)
   }
+}
+
+userModel.methods.getPublic = function () {
+  const data = {
+    _id: this._id,
+    firstName: this.firstName,
+    lastName: this.lastName,
+    username: this.username,
+    profile_image: this.profile_image,
+    cover_image: this.cover_image,
+    createdAt: this.createdAt
+  }
+
+  return data
 }
 
 module.exports = model('User', userModel)

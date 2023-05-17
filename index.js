@@ -4,8 +4,10 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const morgan = require('morgan')
 // Configs
+const CORS_CONFIG = require('./src/config/cors')
+const connectToDB = require('./src/config/db.config')
+
 require('dotenv').config()
-const { connectToDB } = require('./src/config/db.config')
 // Middleware
 const handleError = require('./src/middleware/error.middleware')
 const verifyToken = require('./src/middleware/auth.middleware')
@@ -15,7 +17,7 @@ const app = express()
 
 // Middleware
 app.use(morgan('combined'))
-app.use(cors())
+app.use(cors(CORS_CONFIG))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
