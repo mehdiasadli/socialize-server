@@ -1,6 +1,6 @@
 const User = require('../models/user.model')
 
-const DEFAULT_LIMIT = 1
+const DEFAULT_LIMIT = 20
 const DEFAULT_SORT = -1
 const DEFAULT_PAGE = 1
 

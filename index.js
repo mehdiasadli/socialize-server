@@ -2,6 +2,7 @@
 const express = require('express')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
+const morgan = require('morgan')
 // Configs
 require('dotenv').config()
 const { connectToDB } = require('./src/config/db.config')
@@ -13,6 +14,7 @@ const verifyToken = require('./src/middleware/auth.middleware')
 const app = express()
 
 // Middleware
+app.use(morgan('combined'))
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
