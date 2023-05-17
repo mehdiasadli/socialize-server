@@ -9,42 +9,6 @@ const IMAGE_TYPES = {
   cover: { folder: 'cover_images', field: 'cover_image', name: 'Cover' }
 }
 
-// async function getUsers(req, res, next) {
-//   const isAll = req.query?.all ? req.query.all === 'true' : false
-//   const sort = req.query?.sort ? (req.query.sort === 'asc' ? 1 : -1) : DEFAULT_SORT
-
-//   let limit = parseInt(req.query.limit) || DEFAULT_LIMIT
-//   let page = parseInt(req.query.page) || DEFAULT_PAGE
-
-//   let skip = (page - 1) * limit
-
-//   try {
-//     const total = await User.find().countDocuments()
-//     if (isAll) {
-//       page = 1
-//       limit = total
-//       skip = 0
-//     }
-//     const users = await User.find().skip(skip).limit(limit).sort({ createdAt: sort })
-
-//     const totalPages = Math.ceil(total / limit)
-
-//     return res.status(200).json({
-//       success: true,
-//       status: 200,
-//       message: 'Users fetched successfully',
-//       data: users.map((user) => user.getPublic()),
-//       page,
-//       itemsPerPage: limit,
-//       total,
-//       totalPages,
-//       isAll
-//     })
-//   } catch (error) {
-//     next(error)
-//   }
-// }
-
 async function getUsers(req, res, next) {
   try {
     const total = await User.find().countDocuments()
@@ -66,7 +30,23 @@ async function getUsers(req, res, next) {
   }
 }
 
-async function getUser(req, res) {
+async function getUser(req, res, next) {
+  try {
+    const user = await User.findById(req.params.id)
+    if (!user) next({ message: 'User not found', statusCode: 404 })
+
+    return res.status(200).json({
+      success: true,
+      status: 200,
+      message: 'User fetched successfully',
+      data: user.getPublic()
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+async function getCurrentUser(req, res) {
   return res.status(200).json({
     success: true,
     status: 200,
@@ -150,5 +130,6 @@ module.exports = {
   updateUser,
   getUsers,
   uploadImage,
-  deleteImage
+  deleteImage,
+  getCurrentUser
 }

@@ -7,7 +7,8 @@ const {
   deletePost,
   getPost,
   getPosts,
-  getUserPosts
+  getUserPosts,
+  likePost
 } = require('../controllers/post.controller')
 // Middlewares
 const { validate } = require('../middleware/validate.middleware')
@@ -18,6 +19,7 @@ const { createPostDTO, updatePostDTO } = require('../dto/post.dto')
 router.get('/', validate(paginationDTO), getPosts)
 router.post('/', validate(createPostDTO), createPost)
 router.get('/user/:id', validate(paramIdDTO), getUserPosts)
+router.put('/like/:id', validate(paramIdDTO), likePost)
 router.get('/:id', validate(paramIdDTO), getPost)
 router.put('/:id', validate(paramIdDTO), validate(updatePostDTO), updatePost)
 router.delete('/:id', validate(paramIdDTO), deletePost)

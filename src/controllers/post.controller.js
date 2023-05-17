@@ -89,7 +89,7 @@ async function deletePost(req, res, next) {
 
     const user = await User.findById(req.user._id)
     user.posts = user.posts.filter((post) => post._id != req.params.id)
-    user.save()
+    await user.save()
 
     return res.status(200).json({
       success: true,
@@ -175,4 +175,32 @@ async function getUserPosts(req, res, next) {
     next(error)
   }
 }
-module.exports = { createPost, updatePost, deletePost, getPost, getPosts, getUserPosts }
+
+async function likePost(req, res, next) {
+  try {
+    const post = await Post.findById(req.params.id)
+    if (!post) next({ message: 'Post not found', statusCode: 404 })
+
+    let liked = false
+
+    if (post.likes.includes(req.user._id)) {
+      liked = true
+    }
+
+    if (!liked) {
+      post.likes.push(req.user._id)
+    } else {
+      post.likes = post.likes.filter((like) => like == req.user._id)
+    }
+
+    await post.save()
+    return res.status(200).json({
+      success: true,
+      status: 200,
+      message: liked ? 'Unliked the post' : 'Liked the post'
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+module.exports = { createPost, updatePost, deletePost, getPost, getPosts, getUserPosts, likePost }

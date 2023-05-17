@@ -1,0 +1,23 @@
+User
+Post
+
+auth
+- signin
+- signup
+- signout
+
+user
++- getUser
++- getUsers
+- updateUser
+- uploadImage
+- deleteImage
+
+post
+- createPost
+- updatePost
+- deletePost
++- getPost
++- getPosts
++- getUsersPosts
+- likePost
