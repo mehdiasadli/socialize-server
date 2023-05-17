@@ -1,45 +1,65 @@
 const User = require('../models/user.model')
 const cloudinary = require('../config/cloudinary.config')
+const paginate = require('../lib/utils/paginate')
 
 const DEFAULT_LIMIT = 20
-const DEFAULT_SORT = -1
-const DEFAULT_PAGE = 1
 
 const IMAGE_TYPES = {
   profile: { folder: 'profile_images', field: 'profile_image', name: 'Profile' },
   cover: { folder: 'cover_images', field: 'cover_image', name: 'Cover' }
 }
 
+// async function getUsers(req, res, next) {
+//   const isAll = req.query?.all ? req.query.all === 'true' : false
+//   const sort = req.query?.sort ? (req.query.sort === 'asc' ? 1 : -1) : DEFAULT_SORT
+
+//   let limit = parseInt(req.query.limit) || DEFAULT_LIMIT
+//   let page = parseInt(req.query.page) || DEFAULT_PAGE
+
+//   let skip = (page - 1) * limit
+
+//   try {
+//     const total = await User.find().countDocuments()
+//     if (isAll) {
+//       page = 1
+//       limit = total
+//       skip = 0
+//     }
+//     const users = await User.find().skip(skip).limit(limit).sort({ createdAt: sort })
+
+//     const totalPages = Math.ceil(total / limit)
+
+//     return res.status(200).json({
+//       success: true,
+//       status: 200,
+//       message: 'Users fetched successfully',
+//       data: users.map((user) => user.getPublic()),
+//       page,
+//       itemsPerPage: limit,
+//       total,
+//       totalPages,
+//       isAll
+//     })
+//   } catch (error) {
+//     next(error)
+//   }
+// }
+
 async function getUsers(req, res, next) {
-  const isAll = req.query?.all ? req.query.all === 'true' : false
-  const sort = req.query?.sort ? (req.query.sort === 'asc' ? 1 : -1) : DEFAULT_SORT
-
-  let limit = parseInt(req.query.limit) || DEFAULT_LIMIT
-  let page = parseInt(req.query.page) || DEFAULT_PAGE
-
-  let skip = (page - 1) * limit
-
   try {
     const total = await User.find().countDocuments()
-    if (isAll) {
-      page = 1
-      limit = total
-      skip = 0
-    }
-    const users = await User.find().skip(skip).limit(limit).sort({ createdAt: sort })
-
-    const totalPages = Math.ceil(total / limit)
+    const pagination = await paginate(req.query, total, next, DEFAULT_LIMIT)
+    const users = await User.find()
+      .skip(pagination.skip)
+      .limit(pagination.itemsPerPage)
+      .sort({ createdAt: pagination.sort })
 
     return res.status(200).json({
       success: true,
       status: 200,
       message: 'Users fetched successfully',
       data: users.map((user) => user.getPublic()),
-      page,
-      itemsPerPage: limit,
-      total,
-      totalPages,
-      isAll
+      ...pagination
     })
   } catch (error) {
     next(error)
@@ -57,27 +77,25 @@ async function getUser(req, res) {
 
 async function updateUser(req, res, next) {
   try {
-    const user = await User.findById(req.user._id).select('-password')
+    const user = await User.findById(req.user._id)
 
-    if (user) {
-      user.firstName = req.body.firstName || user.firstName
-      user.lastName = req.body.lastName || user.lastName
-      user.username = req.body.username || user.username
+    if (!user) next({ statusCode: 404, message: 'User not found' })
 
-      if (req.body.password) {
-        user.password = req.body.password
-      }
+    user.firstName = req.body.firstName || user.firstName
+    user.lastName = req.body.lastName || user.lastName
+    user.username = req.body.username || user.username
 
-      const updated = await user.save()
-      res.status(200).json({
-        success: true,
-        status: 200,
-        message: 'User updated successfully',
-        data: updated.getPublic()
-      })
-    } else {
-      next({ statusCode: 404, message: 'User not found' })
+    if (req.body.password) {
+      user.password = req.body.password
     }
+
+    const updated = await user.save()
+    return res.status(200).json({
+      success: true,
+      status: 200,
+      message: 'User updated successfully',
+      data: updated.getPublic()
+    })
   } catch (error) {
     next(error)
   }

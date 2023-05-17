@@ -49,4 +49,4 @@ const deleteImageDTO = z.object({
   })
 })
 
-module.exports = { updateUserDTO, updateProfileImageDTO, uploadImageDTO, deleteImageDTO }
+module.exports = { updateUserDTO, uploadImageDTO, deleteImageDTO }

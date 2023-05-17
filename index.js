@@ -30,9 +30,11 @@ const routes = require('./src/lib/resources/routes')
 
 const authRoute = require('./src/routes/auth.route')
 const userRoute = require('./src/routes/user.route')
+const postRoute = require('./src/routes/post.route')
 
 app.use(routes.auth, authRoute)
 app.use(routes.user, verifyToken, userRoute)
+app.use(routes.post, verifyToken, postRoute)
 // 404 Route
 app.all('*', (_, res) =>
   res.status(404).json({ success: false, status: 404, message: 'Page not found' })

@@ -1,4 +1,15 @@
 const { z } = require('zod')
+const mongoose = require('mongoose')
+
+const paramIdDTO = z.object({
+  params: z.object({
+    id: z
+      .string({ required_error: 'Id is required' })
+      .refine((value) => mongoose.Types.ObjectId.isValid(value), {
+        message: 'Id is invalid'
+      })
+  })
+})
 
 const paginationDTO = z.object({
   query: z.object({
@@ -21,4 +32,4 @@ const paginationDTO = z.object({
   })
 })
 
-module.exports = { paginationDTO }
+module.exports = { paginationDTO, paramIdDTO }

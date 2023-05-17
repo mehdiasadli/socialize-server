@@ -13,13 +13,14 @@ const userModel = new Schema(
     },
     password: { type: String, required: [true, 'Password is required'], trim: true },
     profile_image: {
-      public_id: { type: String, required: true },
-      url: { type: String, required: true }
+      public_id: { type: String },
+      url: { type: String }
     },
     cover_image: {
-      public_id: { type: String, required: true },
-      url: { type: String, required: true }
-    }
+      public_id: { type: String },
+      url: { type: String }
+    },
+    posts: [{ type: Schema.Types.ObjectId, ref: 'Post' }]
   },
   { timestamps: true }
 )
@@ -54,6 +55,18 @@ userModel.methods.getPublic = function () {
     profile_image: this.profile_image,
     cover_image: this.cover_image,
     createdAt: this.createdAt
+  }
+
+  return data
+}
+
+userModel.methods.getWithPost = function () {
+  const data = {
+    _id: this._id,
+    firstName: this.firstName,
+    lastName: this.lastName,
+    username: this.username,
+    profile_image: this.profile_image
   }
 
   return data

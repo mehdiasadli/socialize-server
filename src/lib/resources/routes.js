@@ -4,5 +4,5 @@ const BASE = `/api/v${VERSION}`
 module.exports = {
   auth: BASE + '/auth',
   user: BASE + '/user',
-  notf: '*'
+  post: BASE + '/post'
 }

@@ -3,7 +3,7 @@ const capitalize = require('../lib/utils/capitalize')
 const generateToken = require('../lib/utils/generateToken')
 /**
  * @method POST
- * @route  /api/auth/signin
+ * @route  /api/v1/auth/signin
  * @desc   Signs in the user
  * @access Public
  */
@@ -31,7 +31,7 @@ async function signIn(req, res, next) {
 
 /**
  * @method POST
- * @route  /api/auth/signup
+ * @route  /api/v1/auth/signup
  * @desc   Creates a new user
  * @access Public
  */
@@ -54,7 +54,7 @@ async function signUp(req, res, next) {
       generateToken(res, user._id)
       return res.status(201).json({
         success: true,
-        status: 200,
+        status: 201,
         message: 'User created successfully',
         data: user.getPublic()
       })
@@ -68,7 +68,7 @@ async function signUp(req, res, next) {
 
 /**
  * @method POST
- * @route  /api/auth/signout
+ * @route  /api/v1/auth/signout
  * @desc   Signs out the user
  * @access Public
  */
